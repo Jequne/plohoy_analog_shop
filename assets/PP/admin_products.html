@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админка - Товары</title>
+</head>
+<body>
+    <h2>Админская страница с товарами</h2>
+    <p>Тут можно управлять товарами.</p>
+
+    <h3>Список товаров</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Название</th>
+                <th>Цена</th>
+                <th>Количество</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                <tr id="product-{{ product.id }}">
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.price }}</td>
+                    <td>{{ product.quantity }}</td>
+                    <td>
+                        <!-- Форма для изменения товара -->
+                        <form action="/admin/products/edit/{{ product.id }}" method="post">
+                            <label for="name">Название:</label>
+                            <input type="text" name="name" value="{{ product.name }}" required>
+                            <br><br>
+
+                            <label for="price">Цена:</label>
+                            <input type="number" name="price" value="{{ product.price }}" required>
+                            <br><br>
+
+                            <label for="quantity">Количество:</label>
+                            <input type="number" name="quantity" value="{{ product.quantity }}" required>
+                            <br><br>
+
+                            <button type="submit">Изменить</button>
+                        </form>
+
+                        <!-- Форма для удаления товара (с кнопкой для удаления через AJAX) -->
+                        <button onclick="deleteProduct({{ product.id }})">🗑️ Удалить</button>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+
+    <h3>Добавить новый товар</h3>
+    <form action="/admin/products/add" method="post">
+        <label for="name">Название:</label>
+        <input type="text" name="name" required>
+        <br><br>
+
+        <label for="price">Цена:</label>
+        <input type="number" name="price" required>
+        <br><br>
+
+        <label for="quantity">Количество:</label>
+        <input type="number" name="quantity" required>
+        <br><br>
+
+        <button type="submit">Добавить товар</button>
+    </form>
+
+    <!-- <script>
+        // Функция для удаления товара
+        function deleteProduct(id) {
+            if (confirm("Вы уверены, что хотите удалить этот товар?")) {
+                fetch(`/admin/products/delete/${id}`, {
+                    method: "POST"
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message); // Покажем сообщение о том, что товар удален
+                    // Удалим строку товара из таблицы
+                    document.getElementById(`product-${id}`).remove();
+                })
+                .catch(error => alert("Ошибка удаления товара!"));
+            }
+        }
+    </script> -->
+
+    <script>
+        async function deleteProduct(id) {
+            if (!confirm("Вы уверены, что хотите удалить этот товар?")) {
+                return;
+            }
+    
+            try {
+                const response = await fetch(`/admin/products/delete/${id}`, {
+                    method: "DELETE"
+                });
+    
+                if (!response.ok) {
+                    throw new Error("Ошибка удаления товара! Сервер ответил: " + response.status);
+                }
+    
+                // Проверяем, что сервер вернул JSON
+                const data = await response.json();
+                
+                // Удаляем товар из HTML
+                const row = document.querySelector(`#product-${id}`);
+                if (row) {
+                    row.remove();
+                }
+    
+                alert(data.message);
+    
+            } catch (error) {
+                alert("Ошибка при удалении товара: " + error.message);
+            }
+        }
+    </script>
+    
+    
+</body>
+</html>
+

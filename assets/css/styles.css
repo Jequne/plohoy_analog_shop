@@ -1,0 +1,191 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+15&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jersey+15&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+/*  */
+
+
+body {
+    font-family: "Jersey 15", serif;
+    background-color: rgba(221, 250, 213, 1);   
+    
+}
+
+.container {
+    max-width: 1885px;
+}
+
+.welcome {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+}
+
+.header {
+
+}
+
+.logo {
+    position: static;
+    text-align: center;
+    margin-left: 1%;
+}
+
+.go-back {
+
+}
+
+.go-back-button {
+    text-decoration: None;
+    font-size: 25px;
+    color: rgba(43, 166, 43, 1);
+}
+
+.cart {
+    position: static;
+    text-align: right;
+    margin-right: 1%;
+    margin-top: -4%;
+}
+
+.cart-button {
+    text-decoration: None;
+    font-size: 25px;
+    color: rgba(43, 166, 43, 1);
+}
+
+.logo img {
+    height: 120px;
+    weight: auto;
+}
+
+
+/* НИЖНЕЕ РАЗОБРАЛИСЬ ВСЕ ХОРОШО!!!!!!!!!!!!!! */
+
+
+.under-col {
+    max-width: 1885px;
+    display: flex;
+    flex-direction: column;
+}
+
+.picture-col {
+    position: static;
+    display: flex;
+    justify-content: center;
+}
+
+.picture-col img {
+    height: 75px;
+    weight: auto;
+}
+
+.nav-wrapper-col {
+    position: static;                                         
+    background-color: None; 
+    padding: 10px 0;         
+}
+
+.nav-bar-col {
+
+}
+
+.nav-list {
+    display: flex; 
+    justify-content: center;
+    list-style: none;
+    padding: 0;  
+}
+
+.nav-item {
+    margin: 0 20px;  
+    font-size: 12px;
+}
+
+.nav-item a {
+    font-family: "JetBrains Mono", serif;
+    color: black;            
+    text-decoration: none;   
+    font-size: 11px;  
+    font-weight: 500;
+    transition: text-decoration 0.3s ease; 
+}
+
+
+.nav-item a:hover {
+    color: grey;          
+    text-decoration: underline;
+}
+
+
+/* About */
+
+
+.about-text {
+    font-family: "JetBrains Mono", serif;
+    margin-top: -15%;
+    margin-left: 33%;
+}
+
+.doubledot::after {
+    content: ":";
+}
+
+.about-text a {
+    color: black;
+}
+
+.about-text a:hover {
+    text-decoration: none; 
+}
+
+.about-text p {
+    line-height: 1.5;
+}
+
+
+
+/* Terms_of_Service */
+
+.terms {
+    font-family: "JetBrains Mono", serif;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 45em;
+    margin-top: 5%;
+}
+
+.terms h1 {
+    font-size: medium;
+}
+
+.terms p {
+    font-size: 18px;
+    color: rgba(84, 90, 87, 1);
+}
+
+
+/* Button Styles */
+
+
+#scrollToTop {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    z-index: 1000; /* Поверх остальных элементов */
+    display: block; /* Всегда занимать место */
+    opacity: 0; /* Изначально невидима */
+    visibility: hidden; /* Скрыта для кликов */
+    transition: opacity 1s ease, visibility 1s ease; /* Более плавное появление */
+    width: 60px; /* Увеличено в 2 раза */
+    height: 60px;
+}
+
+#scrollToTop.visible {
+    opacity: 1; /* Полностью видима */
+    visibility: visible; /* Доступна для кликов */
+}
+
