@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 import bcrypt
 
 
-from Plohot_back.db.database import Base
+from db.database import Base
  
 
 class Product(Base):

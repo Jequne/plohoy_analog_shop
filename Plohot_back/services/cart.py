@@ -2,27 +2,34 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from datetime import datetime, timedelta, timezone
 
-from Plohot_back.models.products_data import Product, Reservation
+from models.products_data import Product, Reservation
+from shemas.shemas import ProductBase
 
 class CartLogic():
-    async def add_to_cart(self, db: AsyncSession, product_id: int, session_id: str, quantity: int):
-        result = await db.execute(select(Product).filter(Product.id == product_id))
+    async def add_to_cart(
+                            self, 
+                            db: AsyncSession, 
+                            ProductBase: ProductBase,
+                          ):
+        result = await db.execute(
+            select(Product).filter(Product.id == ProductBase.product_id)
+            )
         product = result.scalars().first()
         
         if not product:
             raise ValueError("Product not found")
-        if product.quantity < quantity:
+        if product.quantity < ProductBase.quantity:
             raise ValueError("Not enough product in stock")
         
         expires_at = datetime.now(timezone.utc) + timedelta(hours=1.5)
         reservation = Reservation(
-            product_id=product_id,
-            session_id=session_id,
-            quantity=quantity,
+            product_id=ProductBase.product_id,
+            session_id=ProductBase.session_id,
+            quantity=ProductBase.quantity,
             expires_at=expires_at
         )
         
-        product.quantity -= quantity
+        product.quantity -= ProductBase.quantity
         
         db.add(reservation)
         await db.commit()
@@ -31,13 +38,17 @@ class CartLogic():
         return reservation
 
     async def delete_from_cart(self, db: AsyncSession, reservation_id: int):
-        result = await db.execute(select(Reservation).filter(Reservation.id == reservation_id))
+        result = await db.execute(
+            select(Reservation).filter(Reservation.id == reservation_id)
+            )
         reservation = result.scalars().first()
         
         if not reservation:
             raise ValueError("Reservation not found")
         
-        result = await db.execute(select(Product).filter(Product.id == reservation.product_id))
+        result = await db.execute(
+            select(Product).filter(Product.id == reservation.product_id)
+            )
         product = result.scalars().first()
         
         if product:
@@ -47,6 +58,8 @@ class CartLogic():
         await db.commit()
 
     async def get_cart(self, db: AsyncSession, session_id: str):
-        result = await db.execute(select(Reservation).filter(Reservation.session_id == session_id))
+        result = await db.execute(
+            select(Reservation).filter(Reservation.session_id == session_id)
+            )
         reservations = result.scalars().all()
         return reservations

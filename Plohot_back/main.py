@@ -2,18 +2,28 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
-from Plohot_back.api.RouteClasses import admin_router, static_routes, cart_logic
+import os
+
+from api.RouteClasses import admin_router, static_routes, cart_logic
+from api.Client_api import router
 
 app = FastAPI()
 
+# base_dir = os.path.dirname(os.path.abspath(__file__))
+
+print("Current working directory:", os.getcwd())
 
 app.mount("/assets/css", StaticFiles(directory="../assets/css"), name="css")
 app.mount("/assets/img", StaticFiles(directory="../assets/img"), name="img")
 app.mount("/assets/scripts-js", StaticFiles(directory="../assets/scripts-js"), name="scripts")
+# app.mount("/assets/css", StaticFiles(directory=os.path.join(base_dir, "../assets/css")), name="css")
+# app.mount("/assets/img", StaticFiles(directory=os.path.join(base_dir, "../assets/img")), name="img")
+# app.mount("/assets/scripts-js", StaticFiles(directory=os.path.join(base_dir, "../assets/scripts-js")), name="scripts")
 
 app.include_router(admin_router)
 app.include_router(static_routes)
 app.include_router(cart_logic)
+app.include_router(router)
 
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_error(request: Request, exc: RateLimitExceeded):

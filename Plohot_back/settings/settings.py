@@ -16,6 +16,7 @@ class Settings(BaseSettings):
             load_dotenv()
         SECRET_KEY: str = Field(..., env="SECRET_KEY")
         ALGORITHM: str = Field(..., env="ALGORITHM")
+        SQLALCHEMY_DATABASE_URL: str = Field(..., env="SQLALCHEMY_DATABASE_URL")
 
 
 setting: Settings | None = None

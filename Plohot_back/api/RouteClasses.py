@@ -1,19 +1,21 @@
 from fastapi import APIRouter, Depends, Request, Form, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.future import select
 import bcrypt
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.templating import Jinja2Templates
 from datetime import datetime, timedelta
+import os
 
-from Plohot_back.models.products_data import AdminInfo, Product
-from Plohot_back.helpers.auth_helper import create_access_token, get_current_user
+from models.products_data import AdminInfo, Product
+from helpers.auth_helper import create_access_token, get_current_user
 from db.database import get_async_db
 
 
+# Получение абсолютного пути к директории проекта
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
-
-
+request_counts = {}
 
 # 🔹 Создаем класс AdminRouter, который расширяет APIRouter
 class AdminRouter(APIRouter):
@@ -47,7 +49,7 @@ class AdminRouter(APIRouter):
                     db: AsyncSession = Depends(get_async_db)
                     ):
         client_ip = request.client.host
-        request_counts = {}
+        
         # Проверяем, сколько запросов было сделано с этого IP
         current_time = datetime.now()
         if client_ip in request_counts:
@@ -65,8 +67,9 @@ class AdminRouter(APIRouter):
             request_counts[client_ip] = (current_time, 1)
         
         
+        result = await db.execute(select(AdminInfo).filter(AdminInfo.id == 1))
+        admin = result.scalars().first()
         
-        admin = db.query(AdminInfo).filter(AdminInfo.id == 1).first()
         if admin and bcrypt.checkpw(password.encode(), admin.password_hash.encode()):
             access_token = create_access_token(data={"sub": "admin"})
             response = JSONResponse(content={"message": "Login successful"})
@@ -95,8 +98,9 @@ class PageRoutes(APIRouter):
     def __init__(self):
         super().__init__()
 
-        self.templates = Jinja2Templates(directory="../assets/PP")
-        
+        # self.templates = Jinja2Templates(directory="/../../assets/PP")
+        self.templates = Jinja2Templates(directory=os.path.join(base_dir, "../../assets/PP"))
+
         self.add_api_route("/plohoy.shop", 
                            self.products_all, 
                            methods=["GET"], 
@@ -134,7 +138,9 @@ class PageRoutes(APIRouter):
 class CartLogic(APIRouter):
     def __init__(self):
         super().__init__()
-        self.templates = Jinja2Templates(directory="../assets/PP")
+        # self.templates = Jinja2Templates(directory="/../../assets/PP")
+        self.templates = Jinja2Templates(directory=os.path.join(base_dir, "../../assets/PP"))
+
         self.add_api_route("/admin/products", 
                            self.admin_products, 
                            methods=["GET"], 
@@ -162,7 +168,8 @@ class CartLogic(APIRouter):
                              db: AsyncSession = Depends(get_async_db), 
                              current_user: str = Depends(get_current_user)
                              ):
-        products = db.query(Product).all()
+        result = await db.execute(select(Product))
+        products = result.scalars().all()
         return self.templates.TemplateResponse("admin_products.html", 
                                                {
                                                 "request": request, 
@@ -177,15 +184,16 @@ class CartLogic(APIRouter):
                           db: AsyncSession = Depends(get_async_db), 
                           current_user: str = Depends(get_current_user)
                            ):
-        if db.query(Product).filter(Product.name == name).first():
+        result = await db.execute(select(Product).filter(Product.name == name))
+        if result.scalars().first():
             response = RedirectResponse(url="/admin/edit-or-no", 
                                         status_code=303
                                         )
             return response
         add_product = Product(name=name, price=price, quantity=quantity)
         db.add(add_product)
-        db.commit()
-        db.refresh(add_product)
+        await db.commit()
+        await db.refresh(add_product)
         return HTMLResponse(
                     """
             <!DOCTYPE html>
@@ -234,13 +242,14 @@ class CartLogic(APIRouter):
                              current_user: str = Depends(get_current_user)
                              ):
         # Ищем товар по ID
-        product = db.query(Product).filter(Product.id == product_id).first()
+        result = await db.execute(select(Product).filter(Product.id == product_id))
+        product = result.scalars().first()
         # Если товар не найден, возвращаем ошибку
         if not product:
             raise HTTPException(status_code=404, detail="Product not found")
         # Удаляем товар из базы данных
-        db.delete(product)
-        db.commit()
+        await db.delete(product)
+        await db.commit()
         # return RedirectResponse(url="/admin/products", status_code=303)
         return JSONResponse(content={"message": "Product deleted successfully"})
 
@@ -254,7 +263,8 @@ class CartLogic(APIRouter):
                            db: AsyncSession = Depends(get_async_db)
                            ):
         # Ищем товар в базе данных
-        product = db.query(Product).filter(Product.id == product_id).first()
+        result = await db.execute(select(Product).filter(Product.id == product_id))
+        product = result.scalars().first()
         # Если товар не найден, возвращаем ошибку
         if not product:
             raise HTTPException(status_code=404, detail="Product not found")
@@ -263,8 +273,8 @@ class CartLogic(APIRouter):
         product.price = price
         product.quantity = quantity
     # Сохраняем изменения в базе данных
-        db.commit()
-        db.refresh(product)
+        await db.commit()
+        await db.refresh(product)
         return RedirectResponse(url="/admin/products", status_code=303)
 
     
