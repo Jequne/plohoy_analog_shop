@@ -28,78 +28,20 @@ class AdminRouter(APIRouter):
             )
         self.add_api_route("/admin/logout", self.logout, methods=["GET"])
 
-    async def login_page(self):
-        """Страница входа"""
-        return HTMLResponse("""
-        <html>
-        <body>
-            <h2>Admin Login</h2>
-            <form action="/admin/login" method="post">
-                <label for="password">Enter Password:</label>
-                <input type="password" id="password" name="password" required>
-                <button type="submit">Login</button>
-            </form>
-        </body>
-        </html>
-        """)
 
-    async def login(self, 
-                    request: Request=None, 
-                    password: str = Form(...), 
-                    db: AsyncSession = Depends(get_async_db)
-                    ):
-        client_ip = request.client.host
-        
-        # Проверяем, сколько запросов было сделано с этого IP
-        current_time = datetime.now()
-        if client_ip in request_counts:
-            last_request_time, count = request_counts[client_ip]
-            if current_time - last_request_time < timedelta(minutes=1):
-                if count >= 5:
-                    raise HTTPException(status_code=429, 
-                                        detail="Too many requests, please try again later."
-                                        )
-                request_counts[client_ip] = (current_time, count + 1)
-            else:
-                # Сбрасываем счетчик, если прошло больше минуты
-                request_counts[client_ip] = (current_time, 1)
-        else:
-            request_counts[client_ip] = (current_time, 1)
-        
-        
-        result = await db.execute(select(AdminInfo).filter(AdminInfo.id == 1))
-        admin = result.scalars().first()
-        
-        if admin and bcrypt.checkpw(password.encode(), admin.password_hash.encode()):
-            access_token = create_access_token(data={"sub": "admin"})
-            response = JSONResponse(content={"message": "Login successful"})
-            response.set_cookie(
-                key="access_token",
-                value=access_token,
-                httponly=True,  # Не доступен для JavaScript
-                secure=True,    # Только для https
-                samesite="Strict",  # Защита от CSRF
-                max_age=28800  # Время жизни токена (например, 8 часов)
-            )
-            return response
-        else:
-                raise HTTPException(status_code=401, detail="Invalid credentials")
+# Получение абсолютного пути к директории проекта
+base_dir = os.path.dirname(os.path.abspath(__file__))
+templates_dir = os.path.abspath(os.path.join(base_dir, "../../assets/PP"))
 
-        
-    async def logout(self, request: Request):
-        response = RedirectResponse(url="/admin/login", status_code=303)
-        response.delete_cookie("access_token")  # Удаляем куки
-        return response
-
-
+# Указание пути к директории шаблонов
+templates = Jinja2Templates(directory=templates_dir)
 
 # Класс с базовыми страничками! Которые видны пользователю
 class PageRoutes(APIRouter):
     def __init__(self):
         super().__init__()
 
-        # self.templates = Jinja2Templates(directory="/../../assets/PP")
-        self.templates = Jinja2Templates(directory=os.path.join(base_dir, "../../assets/PP"))
+        self.templates = templates
 
         self.add_api_route("/plohoy.shop", 
                            self.products_all, 
@@ -138,8 +80,7 @@ class PageRoutes(APIRouter):
 class CartLogic(APIRouter):
     def __init__(self):
         super().__init__()
-        # self.templates = Jinja2Templates(directory="/../../assets/PP")
-        self.templates = Jinja2Templates(directory=os.path.join(base_dir, "../../assets/PP"))
+        self.templates = templates
 
         self.add_api_route("/admin/products", 
                            self.admin_products, 
@@ -221,7 +162,7 @@ class CartLogic(APIRouter):
                 </head>
                 <body>
                     <h2>Данный товар уже есть в базе данных</h2>
-                    <p>Вы хотите что-либо изменить в нем или же нет?</p>
+                    <п>Вы хотите что-либо изменить в нем или же нет?</п>
                     
                     <form action="/edit-product" method="get">
                         <button type="submit">Yes</button>
@@ -283,4 +224,3 @@ class CartLogic(APIRouter):
 admin_router = AdminRouter()
 static_routes = PageRoutes()
 cart_logic = CartLogic()
-

@@ -9,16 +9,17 @@ from api.Client_api import router
 
 app = FastAPI()
 
-# base_dir = os.path.dirname(os.path.abspath(__file__))
+# Получение абсолютного пути к корневой директории проекта
+base_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(base_dir, ".."))
 
 print("Current working directory:", os.getcwd())
+print("Project root directory:", project_root)
 
-app.mount("/assets/css", StaticFiles(directory="../assets/css"), name="css")
-app.mount("/assets/img", StaticFiles(directory="../assets/img"), name="img")
-app.mount("/assets/scripts-js", StaticFiles(directory="../assets/scripts-js"), name="scripts")
-# app.mount("/assets/css", StaticFiles(directory=os.path.join(base_dir, "../assets/css")), name="css")
-# app.mount("/assets/img", StaticFiles(directory=os.path.join(base_dir, "../assets/img")), name="img")
-# app.mount("/assets/scripts-js", StaticFiles(directory=os.path.join(base_dir, "../assets/scripts-js")), name="scripts")
+# Настройка маршрутизации для статических файлов
+app.mount("/assets/css", StaticFiles(directory=os.path.join(project_root, "assets/css")), name="css")
+app.mount("/assets/img", StaticFiles(directory=os.path.join(project_root, "assets/img")), name="img")
+app.mount("/assets/scripts-js", StaticFiles(directory=os.path.join(project_root, "assets/scripts-js")), name="scripts")
 
 app.include_router(admin_router)
 app.include_router(static_routes)
@@ -32,11 +33,8 @@ async def rate_limit_error(request: Request, exc: RateLimitExceeded):
         content={"detail": "Too many requests, please try again later."}
     )
 
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
-
-
 
 

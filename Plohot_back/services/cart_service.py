@@ -1,0 +1,29 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import HTTPException
+from shemas.shemas import ProductAdd
+from services.cart import CartLogic
+
+class CartService:
+    def __init__(self):
+        self.cart_logic = CartLogic()
+
+    async def add_to_cart(self, db: AsyncSession, product_add: ProductAdd):
+        try:
+            reservation = await self.cart_logic.add_to_cart(db, product_add)
+            return {"message": "Product added to cart", "reservation": reservation}
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+    async def delete_from_cart(self, db: AsyncSession, reservation_id: int):
+        try:
+            await self.cart_logic.delete_from_cart(db, reservation_id)
+            return {"message": "Product removed from cart"}
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+    async def get_cart(self, db: AsyncSession, session_id: str):
+        try:
+            cart = await self.cart_logic.get_cart(db, session_id)
+            return {"cart": cart}
+        except ValueError as e:
+            raise HTTPException(status_code=400, detail=str(e))

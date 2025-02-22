@@ -11,7 +11,7 @@
         <header class="header">
             <div class="container">
                 <div class="logo">
-                    <a href="/product"><img src="..\assets\img\logo.png" alt="Logo"></a>
+                    <a href="/product"><img src="/assets/img/logo.png" alt="Logo"></a>
                 </div>
                 
                 <!--  
@@ -34,13 +34,15 @@
         <div class="product-card">
             <a href="product-page.html" class="product-link">
                 <img 
-                    src="product-image.png" 
+                    src="/assets/img/product-image.jpg"
                     alt="Product Image" 
                     class="product-image available" 
                     data-available="true"
+  
                 />
                 <span class="out-of-stock-label">Товара нет в наличии</span>
             </a>
+            <!-- <p>Количество товара: {{ product.quantity }}</p> -->
         </div>
         
 
@@ -49,7 +51,7 @@
     
     <footer class="under-col">
         <div class="picture-col">
-            <img src="..\assets\img\smiley.png" alt="plohoy smiley">
+            <img src="/assets/img/smiley.png" alt="plohoy smiley">
         </div>
         <div class="nav-wrapper-col">
             <div class="nav-bar-col">
