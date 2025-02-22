@@ -18,16 +18,18 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 request_counts = {}
 
 # 🔹 Создаем класс AdminRouter, который расширяет APIRouter
+
+
 class AdminRouter(APIRouter):
     def __init__(self):
         super().__init__()
         self.add_api_route("/admin/login", self.login_page, methods=["GET"])
         self.add_api_route(
-            "/admin/login", self.login, 
+            "/admin/login", self.login,
             methods=["POST"],
-            )
+        )
         self.add_api_route("/admin/logout", self.logout, methods=["GET"])
-    
+
     async def login_page(self):
         """Страница входа"""
         return HTMLResponse("""
@@ -44,12 +46,12 @@ class AdminRouter(APIRouter):
         """)
 
     async def login(
-            self, 
-            request: Request=None, 
-            password: str = Form(...), 
+            self,
+            request: Request = None,
+            password: str = Form(...),
             db: AsyncSession = Depends(get_async_db)
-            ):
-        
+    ):
+
         client_ip = request.client.host
         # Проверяем, сколько запросов было сделано с этого IP
         current_time = datetime.now()
@@ -58,19 +60,19 @@ class AdminRouter(APIRouter):
             if current_time - last_request_time < timedelta(minutes=1):
                 if count >= 5:
                     raise HTTPException(
-                        status_code=429, 
+                        status_code=429,
                         detail="Too many requests, please try again later."
-                        )
+                    )
                 request_counts[client_ip] = (current_time, count + 1)
             else:
                 # Сбрасываем счетчик, если прошло больше минуты
                 request_counts[client_ip] = (current_time, 1)
         else:
             request_counts[client_ip] = (current_time, 1)
-        
+
         result = await db.execute(select(AdminInfo).filter(AdminInfo.id == 1))
         admin = result.scalars().first()
-        
+
         if admin and bcrypt.checkpw(password.encode(), admin.password_hash.encode()):
             access_token = create_access_token(data={"sub": "admin"})
             response = JSONResponse(content={"message": "Login successful"})
@@ -84,9 +86,8 @@ class AdminRouter(APIRouter):
             )
             return response
         else:
-                raise HTTPException(status_code=401, detail="Invalid credentials")
+            raise HTTPException(status_code=401, detail="Invalid credentials")
 
-        
     async def logout(self, request: Request):
         response = RedirectResponse(url="/admin/login", status_code=303)
         response.delete_cookie("access_token")  # Удаляем куки
@@ -101,97 +102,96 @@ templates_dir = os.path.abspath(os.path.join(base_dir, "../../assets/PP"))
 templates = Jinja2Templates(directory=templates_dir)
 
 # Класс с базовыми страничками! Которые видны пользователю
+
+
 class PageRoutes(APIRouter):
     def __init__(self):
         super().__init__()
 
         self.templates = templates
 
-        self.add_api_route("/plohoy.shop", 
-                           self.products_all, 
-                           methods=["GET"], 
+        self.add_api_route("/plohoy.shop",
+                           self.products_all,
+                           methods=["GET"],
                            response_class=HTMLResponse
                            )
-        self.add_api_route("/About", 
-                           self.about, 
-                           methods=["GET"], 
-                           response_class=HTMLResponse
-                           )        
-        self.add_api_route("/terms-of-service", 
-                           self.terms_serv, 
-                           methods=["GET"], 
-                           response_class=HTMLResponse
-                           )  
-        self.add_api_route("/product", 
-                           self.product, 
-                           methods=["GET"], 
+        self.add_api_route("/About",
+                           self.about,
+                           methods=["GET"],
                            response_class=HTMLResponse
                            )
+        self.add_api_route("/terms-of-service",
+                           self.terms_serv,
+                           methods=["GET"],
+                           response_class=HTMLResponse
+                           )
+
 
     async def products_all(self, request: Request):
         return self.templates.TemplateResponse("product.html", {"request": request})
 
     async def about(self, request: Request):
         return self.templates.TemplateResponse("about.html", {"request": request})
-        
+
     async def terms_serv(self, request: Request):
         return self.templates.TemplateResponse("Terms_of_Service.html", {"request": request})
-
-    async def product(self, request: Request):
-        return self.templates.TemplateResponse("product.html", {"request": request})
+    
+ 
 
 # Класс для логики работы с корзиной и товарами.
+
+
 class CartLogic(APIRouter):
     def __init__(self):
         super().__init__()
         self.templates = templates
 
-        self.add_api_route("/admin/products", 
-                           self.admin_products, 
-                           methods=["GET"], 
+        self.add_api_route("/admin/products",
+                           self.admin_products,
+                           methods=["GET"],
                            response_class=HTMLResponse
                            )
-        self.add_api_route("/admin/products/add", 
-                           self.add_product, 
+        self.add_api_route("/admin/products/add",
+                           self.add_product,
                            methods=["POST"]
                            )
-        self.add_api_route("/admin/edit-or-no", 
-                           self.edit_or_no, 
+        self.add_api_route("/admin/edit-or-no",
+                           self.edit_or_no,
                            methods=["GET"]
                            )
-        self.add_api_route("/admin/products/delete/{product_id}", 
-                           self.delete_product, 
+        self.add_api_route("/admin/products/delete/{product_id}",
+                           self.delete_product,
                            methods=["DELETE"]
                            )
-        self.add_api_route("/admin/products/edit/{product_id}", 
-                           self.edit_product, 
+        self.add_api_route("/admin/products/edit/{product_id}",
+                           self.edit_product,
                            methods=["POST"]
                            )
 
-    async def admin_products(self, 
-                             request: Request, 
-                             db: AsyncSession = Depends(get_async_db), 
+    async def admin_products(self,
+                             request: Request,
+                             db: AsyncSession = Depends(get_async_db),
                              current_user: str = Depends(get_current_user)
                              ):
         result = await db.execute(select(Product))
         products = result.scalars().all()
-        return self.templates.TemplateResponse("admin_products.html", 
+        return self.templates.TemplateResponse("admin_products.html",
                                                {
-                                                "request": request, 
-                                                "products": products
-                                                }
+                                                   "request": request,
+                                                   "products": products
+                                               }
                                                )
 
-    async def add_product(self, 
-                          name: str = Form(...), 
-                          price: int = Form(...), 
-                          quantity: int = Form(...),\
-                          db: AsyncSession = Depends(get_async_db), 
+    async def add_product(self,
+                          name: str = Form(...),
+                          price: int = Form(...),
+                          quantity: int = Form(...),
+                          db: AsyncSession = Depends(get_async_db),
                           current_user: str = Depends(get_current_user)
-                           ):
+                          ):
         result = await db.execute(select(Product).filter(Product.name == name))
         if result.scalars().first():
-            response = RedirectResponse(url="/admin/edit-or-no", 
+            response = RedirectResponse(url="/admin/edit-or-no",
                                         status_code=303
                                         )
             return response
@@ -200,7 +200,7 @@ class CartLogic(APIRouter):
         await db.commit()
         await db.refresh(add_product)
         return HTMLResponse(
-                    """
+            """
             <!DOCTYPE html>
             <html lang="ru">
             <head>
@@ -215,9 +215,9 @@ class CartLogic(APIRouter):
             """
         )
 
-    async def edit_or_no(self, request:Request):
-            return HTMLResponse(
-                """
+    async def edit_or_no(self, request: Request):
+        return HTMLResponse(
+            """
                 <!DOCTYPE html>
                 <html lang="ru">
                 <head>
@@ -238,12 +238,12 @@ class CartLogic(APIRouter):
                 </body>
                 </html>
                 """
-                )
-    
-    async def delete_product(self, 
-                             product_id: int, 
-                             request: Request, 
-                             db: AsyncSession = Depends(get_async_db), 
+        )
+
+    async def delete_product(self,
+                             product_id: int,
+                             request: Request,
+                             db: AsyncSession = Depends(get_async_db),
                              current_user: str = Depends(get_current_user)
                              ):
         # Ищем товар по ID
@@ -258,13 +258,11 @@ class CartLogic(APIRouter):
         # return RedirectResponse(url="/admin/products", status_code=303)
         return JSONResponse(content={"message": "Product deleted successfully"})
 
-    
-
-    async def edit_product(self, 
-                           product_id: int, 
-                           name: str = Form(...), 
-                           price: int = Form(...), 
-                           quantity: int = Form(...), 
+    async def edit_product(self,
+                           product_id: int,
+                           name: str = Form(...),
+                           price: int = Form(...),
+                           quantity: int = Form(...),
                            db: AsyncSession = Depends(get_async_db)
                            ):
         # Ищем товар в базе данных
@@ -282,7 +280,6 @@ class CartLogic(APIRouter):
         await db.refresh(product)
         return RedirectResponse(url="/admin/products", status_code=303)
 
-    
 
 # Создаем объекты маршрутизатора
 admin_router = AdminRouter()
