@@ -43,9 +43,16 @@ async def get_cart(
     return await cart_service.get_cart(db, session_id)
 
 @router.get("/product/{product_id}", response_class=HTMLResponse)
-async def get_product_page(product_id: int, request: Request, db: AsyncSession = Depends(get_async_db)):
+async def get_product_page(
+    product_id: int, 
+    request: Request, 
+    db: AsyncSession = Depends(get_async_db)
+    ):
     result = await db.execute(select(Product).filter(Product.id == product_id))
     product = result.scalars().first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-    return templates.TemplateResponse("product.html", {"request": request, "product": product})
+    return templates.TemplateResponse(
+        "product.html", 
+        {"request": request, "product": product}
+        )
