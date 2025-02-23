@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, HTTPException
+from fastapi import APIRouter, Depends, Request, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.templating import Jinja2Templates
 from models.products_data import Product
 from fastapi.responses import HTMLResponse
@@ -10,6 +10,7 @@ from shemas.shemas import ProductAdd
 from helpers.cart_session_helper import session_create
 from db.database import get_async_db
 from services.cart_service import CartService
+from services.web_sockets import WebSocketManager
 
 router = APIRouter(prefix="/cart", tags=["cart"])
 
@@ -20,6 +21,7 @@ templates = Jinja2Templates(directory=templates_dir)
 
 cart_service = CartService()
 
+ws_manager = WebSocketManager()
 
 @router.post("/add-to-cart")
 async def add_to_cart(
@@ -46,5 +48,11 @@ async def get_cart(
     return await cart_service.get_cart(db, session_id)
 
 
-
-
+@router.websocket("/plohoy.shop")
+async def websocket_endpoint(websocket: WebSocket):
+    await ws_manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)

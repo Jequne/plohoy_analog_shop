@@ -6,8 +6,9 @@ import os
 
 from api.RouteClasses import admin_router, static_routes, cart_logic
 from api.Client_api import router
+from api.on_event import lifespan
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
 # Получение абсолютного пути к корневой директории проекта
 base_dir = os.path.dirname(os.path.abspath(__file__))
