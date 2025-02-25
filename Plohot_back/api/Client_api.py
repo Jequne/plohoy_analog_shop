@@ -48,7 +48,7 @@ async def get_cart(
     return await cart_service.get_cart(db, session_id)
 
 
-@router.websocket("/plohoy.shop")
+@router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await ws_manager.connect(websocket)
     try:

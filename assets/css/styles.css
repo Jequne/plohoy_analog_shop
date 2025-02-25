@@ -189,3 +189,104 @@ body {
     visibility: visible; /* Доступна для кликов */
 }
 
+
+
+
+
+
+/* ТОВАРЫ НА СТРАНИЦЕ */
+
+
+
+
+/* Основной контейнер для всех продуктов */
+.products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    justify-items: center;
+}
+
+/* Карточка продукта */
+.product-card {
+    position: relative;
+    width: 250px;
+    height: 300px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+    transform: scale(1.05);
+}
+
+/* Ссылка на продукт */
+.product-link {
+    display: block;
+    position: relative;
+    text-align: center;
+}
+
+/* Картинка товара */
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: opacity 0.3s ease;
+}
+
+/* Метка "Товара нет в наличии" */
+.out-of-stock-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+    color: white;
+    background-color: rgba(255, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: none; /* Скрываем по умолчанию */
+}
+
+/* Оверлей с количеством */
+.quantity-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 10px 20px;
+    border-radius: 6px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Появление количества при наведении */
+.product-card:hover .quantity-overlay {
+    display: block;
+    opacity: 1;
+}
+
+/* Стили для картинок с отсутствующим товаром */
+.product-card .out-of-stock-label {
+    display: block; /* Показываем, если товара нет в наличии */
+}
+
+.product-card .quantity-overlay {
+    display: none; /* Скрыть количество, если товара нет */
+}
+
+/* Стили для когда товара нет в наличии */
+.product-card.out-of-stock .product-image {
+    opacity: 0.4; /* Прозрачность для картинок с отсутствующим товаром */
+}

@@ -28,27 +28,23 @@
     
 
 
-
-        <!-- Products -->
-
-        <div class="product-card">
-            <a href="/product" class="product-link">
-                <img 
-                    src="/assets/img/product-image.jpg"
-                    alt="Product Image" 
-                    class="product-image available" 
-                    data-available="true"
-  
-                />
-                <span class="out-of-stock-label">Товара нет в наличии</span>
+   <!-- Products -->
+    <div class="products-container">
+        {% for product in products %}
+        <div class="product-card" id="product-{{ product.id }}">
+            <a href="/product/{{ product.id }}" class="product-link">
+                <img src="/assets/img/product-image-{{ product.id }}.jpg" alt="{{ product.name }} Image"
+                 class="product-image" 
+                 data-product-id="{{ product.id }}" 
+                 onmouseover="showQuantity({{ product.id }})" 
+                 onmouseout="hideQuantity({{ product.id }})"/>
+                <span class="out-of-stock-label" style="display: {% if product.quantity == 0 %} block {% else %} none {% endif %}">Товара нет в наличии</span>
+                <div id="quantity-{{ product.id }}" class="quantity-overlay" style="display: none;">Quantity: {{ product.quantity }}</div>
             </a>
-            {#<!-- <p>Количество: {{ product.quantity }}</p> -->#}
         </div>
+        {% endfor %}
+    </div>
         
-
-        <div class ="products-container">
-            {}
-        </div>
 
 
     <!-- Under Colontitul -->
@@ -80,5 +76,42 @@
         </div>     
     </div>       
     </footer>    
+
+    <script>
+        const socket = new WebSocket('ws://localhost:8000/plohoy.shop'); // Убедись, что путь правильный
+
+        socket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            const productId = Object.keys(data)[0];
+            const quantity = data[productId];
+            const quantityElement = document.getElementById(`quantity-${productId}`);
+            if (quantityElement) {
+                quantityElement.textContent = `Quantity: ${quantity}`;
+            }
+        };
+
+        socket.onopen = function() {
+            console.log("WebSocket connection established");
+        };
+
+        socket.onclose = function() {
+            console.log("WebSocket connection closed");
+        };
+
+        function showQuantity(productId) {
+            const quantityElement = document.getElementById(`quantity-${productId}`);
+            if (quantityElement) {
+                quantityElement.style.display = 'block';
+            }
+        }
+
+        function hideQuantity(productId) {
+            const quantityElement = document.getElementById(`quantity-${productId}`);
+            if (quantityElement) {
+                quantityElement.style.display = 'none';
+            }
+        }
+    </script>
+
 </body>
 </html>

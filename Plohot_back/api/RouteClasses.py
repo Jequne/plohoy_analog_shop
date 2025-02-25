@@ -127,8 +127,16 @@ class PageRoutes(APIRouter):
                            )
 
 
-    async def products_all(self, request: Request):
-        return self.templates.TemplateResponse("product.html", {"request": request})
+    async def products_all(self, 
+                           request: Request,
+                           db: AsyncSession = Depends(get_async_db)
+                           ):
+        result = await db.execute(select(Product))
+        products = result.scalars().all()
+        return self.templates.TemplateResponse(
+            "product.html", 
+            {"request": request, "products": products}
+                                               )
 
     async def about(self, request: Request):
         return self.templates.TemplateResponse("about.html", {"request": request})
