@@ -290,3 +290,84 @@ body {
 .product-card.out-of-stock .product-image {
     opacity: 0.4; /* Прозрачность для картинок с отсутствующим товаром */
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.product-page-info {
+    display: flex;
+    flex-direction: column;
+    margin-left: auto; 
+    margin-right: 100px;
+    margin-top: -400px;
+    
+}
+
+.three-buttons {
+    display: flex;
+    align-items: center;
+    gap: 2px; /* Маленький зазор между кнопками */
+    justify-content: flex-end; /* Размещение блока справа */
+    width: 750px; /* Сделаем блок уже */
+    
+
+/* Общие стили для кнопок */
+.del-from-cart,
+.add-to-cart,
+.go-to-cart {
+    background-color: black; /* Черный фон */
+    color: white; /* Белый текст */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Тонкая прозрачная граница */
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 0px;
+    transition: background 0.3s ease, opacity 0.3s ease;
+}
+
+/* Кнопки +/- */
+.del-from-cart,
+.add-to-cart {
+    width: 40px;
+    height: 60px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Центральная кнопка (ссылка) */
+.go-to-cart {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+}
+
+/* Ховер-эффект */
+.del-from-cart:hover,
+.add-to-cart:hover,
+.go-to-cart:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    opacity: 0.8;
+}
+
+.nav-product {
+}
+.nav-item-product a {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
