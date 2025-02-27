@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{product.name}}</title>
+    <link rel="stylesheet" href="/assets/css/styles.css?v=2">
+</head>
+<body>
+    <div class="welcome">
+        <header class="header">
+            <div class="container">
+                <div class="logo">
+                    <img src="\assets\img\logo.png" href="#" alt="Logo">
+                </div>
+                
+                <!--  
+                <div class="go-back">
+                    <a href="#" class="go-back-button" >GO BACK</a>
+                </div>
+               -->
+                
+                <div class="cart">
+                    <a href="#" class="cart-button">CART (0)</a>
+                </div>
+            </div>
+        </header>
+    
+    
+    <div class="product-page-info">
+        <h1>{{product.name}} <span class="product-price">{{product.price}} ₽</span></h1>
+        <div class="three-buttons">
+            <button class="del-from-cart">-</button>
+            <a href="#" class="go-to-cart">
+                <span>В корзине {{product.count}} шт</span>
+                <span>Перейти</span>
+            </a>
+            <button class="add-to-cart">+</button>
+        </div>
+        <div class="page-text">
+            <h2>WEAVET HET</h2>
+            <ul class="nav-product">
+                <li class="nav-item-product">
+                    <a>green color</a>
+                </li>
+                <li class="nav-item-product">
+                    <a>Branded magnettic buttons</a>
+                </li>
+                <li class="nav-item-product">
+                    <a>Shipping</a>
+                </li>
+            </ul>
+            <span>LIMITED STOCK</span>
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- Under Colontitul -->
+    
+    <footer class="under-col">
+        <div class="picture-col">
+            <img src="\assets\img\smiley.png" alt="plohoy smiley">
+        </div>
+        <div class="nav-wrapper-col">
+            <div class="nav-bar-col">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">Terms of Service</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">Privacy Policy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">Return & Refund Policy</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#">Support</a>
+                    </li>
+                </ul>
+            </div>
+        </div>     
+    </div>       
+    </footer>    
+</body>
+</html>

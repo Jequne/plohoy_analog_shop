@@ -11,16 +11,11 @@ from api.products_api import product_route
 
 
 
-print(os.getcwd())  # Выведет текущую рабочую директорию
-
 app = FastAPI(lifespan=lifespan)
 
 # Получение абсолютного пути к корневой директории проекта
 base_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.abspath(os.path.join(base_dir, ".."))
-
-print("Current working directory:", os.getcwd())
-print("Project root directory:", project_root)
 
 # Настройка маршрутизации для статических файлов
 app.mount("/assets/css", StaticFiles(directory=os.path.join(project_root, "assets/css")), name="css")
