@@ -7,6 +7,11 @@ import os
 from api.RouteClasses import admin_router, static_routes, cart_logic
 from api.Client_api import router
 from api.on_event import lifespan
+from api.products_api import product_route
+
+
+
+print(os.getcwd())  # Выведет текущую рабочую директорию
 
 app = FastAPI(lifespan=lifespan)
 
@@ -26,6 +31,7 @@ app.include_router(admin_router)
 app.include_router(static_routes)
 app.include_router(cart_logic)
 app.include_router(router)
+app.include_router(product_route)
 
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_error(request: Request, exc: RateLimitExceeded):

@@ -75,7 +75,7 @@ class AdminRouter(APIRouter):
 
         if admin and bcrypt.checkpw(password.encode(), admin.password_hash.encode()):
             access_token = create_access_token(data={"sub": "admin"})
-            response = JSONResponse(content={"message": "Login successful"})
+            response = RedirectResponse(url="/admin/products", status_code=303)
             response.set_cookie(
                 key="access_token",
                 value=access_token,
@@ -125,6 +125,7 @@ class PageRoutes(APIRouter):
                            methods=["GET"],
                            response_class=HTMLResponse
                            )
+        
 
 
     async def products_all(self, 

@@ -5,6 +5,7 @@ from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 import os
+from starlette.templating import Jinja2Templates
 
 from shemas.shemas import ProductAdd
 from helpers.cart_session_helper import session_create
@@ -12,18 +13,16 @@ from db.database import get_async_db
 from services.cart_service import CartService
 from services.web_sockets import WebSocketManager
 
-router = APIRouter(prefix="/cart", tags=["cart"])
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-templates_dir = os.path.abspath(os.path.join(base_dir, "../../assets/PP"))
-
-templates = Jinja2Templates(directory=templates_dir)
+router = APIRouter()
 
 cart_service = CartService()
 
 ws_manager = WebSocketManager()
 
-@router.post("/add-to-cart")
+templates = Jinja2Templates(directory="../../assets/PP")
+
+@router.post("/add-to-cart/{product_add.product_id}")
 async def add_to_cart(
     product_add: ProductAdd,
     db: AsyncSession = Depends(get_async_db)
@@ -56,3 +55,6 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.receive_text()
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket)
+
+
+
