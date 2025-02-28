@@ -19,7 +19,7 @@ class ProductBase(BaseModel):
         arbitrary_types_allowed = True
 
 class ProductAdd(ProductBase):
-    response: Response
+    pass
     
     class Config:
         arbitrary_types_allowed = True

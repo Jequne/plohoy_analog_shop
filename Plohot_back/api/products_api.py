@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
 from fastapi.templating import Jinja2Templates
-from models.products_data import Product
+from models.products_data import Product, Reservation
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.templating import Jinja2Templates
 
@@ -32,3 +32,5 @@ async def get_product(
             "product": product
         }
     )
+
+

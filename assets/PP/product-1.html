@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{product.name}}</title>
-    <link rel="stylesheet" href="/assets/css/styles.css?v=2">
+    <link rel="stylesheet" href="/assets/css/styles.css?v=3">
 </head>
 <body>
     <div class="welcome">
@@ -30,12 +30,28 @@
     <div class="product-page-info">
         <h1>{{product.name}} <span class="product-price">{{product.price}} ₽</span></h1>
         <div class="three-buttons">
-            <button class="del-from-cart">-</button>
-            <a href="#" class="go-to-cart">
+            <!-- <button class="del-from-cart" 
+                data-product-id="{{ product.id }}"
+                data-product-name="{{ product.name }}"
+                data-product-price="{{ product.price }}"
+                data-product-quantity="{{ product.quantity }}">-</button> -->
+
+                <button class="del-from-cart" >-</button>
+
+            
+                <a href="#" class="go-to-cart" 
+                    data-product-id="{{ product.id }}"
+                    data-product-name="{{ product.name }}"
+                    data-product-price="{{ product.price }}"
+                    data-product-quantity="{{ product.quantity }}">
                 <span>В корзине {{product.count}} шт</span>
                 <span>Перейти</span>
             </a>
-            <button class="add-to-cart">+</button>
+            <button class="add-to-cart" 
+                data-product-id="{{ product.id }}"
+                data-product-name="{{ product.name }}"
+                data-product-price="{{ product.price }}"
+                data-product-quantity="{{ product.quantity }}">+</button>
         </div>
         <div class="page-text">
             <h2>WEAVET HET</h2>
@@ -54,6 +70,82 @@
         </div>
     </div>
 
+
+
+    
+    <script>
+        // Получаем элементы кнопок
+        const addToCartBtn = document.querySelector('.add-to-cart');
+        const delFromCartBtn = document.querySelector('.del-from-cart');
+        const cartButton = document.querySelector('.cart-button');
+
+        // Получаем данные о продукте из атрибутов кнопки
+        const productData = {
+            id: addToCartBtn.getAttribute('data-product-id'),
+            name: addToCartBtn.getAttribute('data-product-name'),
+            price: addToCartBtn.getAttribute('data-product-price'),
+            quantity: addToCartBtn.getAttribute('data-product-quantity')
+        };
+
+        // Функция для добавления товара в корзину
+        async function addToCart(productData) {
+            const response = await fetch(`/add-to-cart/${productData.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: productData.id,
+                    name: productData.name,
+                    price: productData.price,
+                    quantity: 1,  // например, добавляем 1 штуку
+                    session_id: document.cookie.session_id || "some_default_session_id" // или значение из cookie
+                }),
+            });
+
+            if (response.ok) {
+                // Успешно добавлено в корзину, обновляем UI
+                alert('Товар добавлен в корзину!');
+                updateCartButton();
+            } else {
+                alert('Ошибка при добавлении в корзину');
+            }
+        }
+
+        // Функция для удаления товара из корзины
+        async function deleteFromCart(productData) {
+            const response = await fetch(`/delete-from-cart/${productData.id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                // Успешно удалено из корзины, обновляем UI
+                alert('Товар удален из корзины');
+                updateCartButton();
+            } else {
+                alert('Ошибка при удалении из корзины');
+            }
+        }
+
+        // Функция для обновления кнопки корзины
+        async function updateCartButton() {
+            const response = await fetch('/cart', {
+                method: 'GET',
+            });
+            const data = await response.json();
+            const cartCount = data.cartItemsCount; // Предположим, что сервер возвращает количество товаров в корзине
+            cartButton.innerText = `CART (${cartCount})`;
+        }
+
+        // Обработчики событий для кнопок
+        addToCartBtn.addEventListener('click', () => addToCart(productData));
+        delFromCartBtn.addEventListener('click', () => deleteFromCart(productData));
+
+        // Инициализируем начальное количество товаров в корзине
+        updateCartButton();
+    </script>
+
+    
 
 
 
@@ -90,3 +182,4 @@
     </footer>    
 </body>
 </html>
+

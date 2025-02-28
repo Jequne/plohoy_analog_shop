@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Request, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, Request, HTTPException, WebSocket, WebSocketDisconnect, BackgroundTasks
 from fastapi.templating import Jinja2Templates
 from models.products_data import Product
 from fastapi.responses import HTMLResponse
@@ -22,7 +22,7 @@ ws_manager = WebSocketManager()
 
 templates = Jinja2Templates(directory="../../assets/PP")
 
-@router.post("/add-to-cart/{product_add.product_id}")
+@router.post("/add-to-cart/{product_id}")
 async def add_to_cart(
     product_add: ProductAdd,
     db: AsyncSession = Depends(get_async_db)
@@ -57,4 +57,12 @@ async def websocket_endpoint(websocket: WebSocket):
         ws_manager.disconnect(websocket)
 
 
+@router.get("/clear-expired")
+async def clear_expired_reservations(
+    background_tasks: BackgroundTasks, 
+    db: AsyncSession = Depends(get_async_db)
+    ):
+    # Добавляем задачу очистки в фоновый режим
+    background_tasks.add_task(cart_service.clear_expired_reservations, db)
+    return {"message": "Expired reservations are being cleared."}
 
