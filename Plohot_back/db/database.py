@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.future import select
 
 from settings.settings import get_settings
 
@@ -27,3 +28,7 @@ async def get_async_db():
 #     db.delete(product)
 #     db.commit()
 #     db.refresh
+
+
+
+ 

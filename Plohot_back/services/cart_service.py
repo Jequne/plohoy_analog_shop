@@ -27,3 +27,7 @@ class CartService:
             return {"cart": cart}
         except ValueError as e:
             raise HTTPException(status_code=400, detail=str(e))
+        
+    async def clear_expired_reservations(self, db:AsyncSession):
+        await self.cart_logic.clear_expired_reservations(db)
+        return {"message": "Expired reservations cleared"}
