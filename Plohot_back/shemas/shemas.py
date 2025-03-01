@@ -25,3 +25,9 @@ class ProductAdd(ProductBase):
         arbitrary_types_allowed = True
 
 
+class ProductCartDelete(BaseModel):
+    reservation_id: int
+    session_id: str
+    
+    class Config:
+        arbitrary_types_allowed = True

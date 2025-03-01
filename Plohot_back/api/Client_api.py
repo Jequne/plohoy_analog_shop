@@ -7,7 +7,7 @@ from sqlalchemy.future import select
 import os
 from starlette.templating import Jinja2Templates
 
-from shemas.shemas import ProductAdd
+from shemas.shemas import ProductAdd, ProductCartDelete
 from helpers.cart_session_helper import  session_create_1
 from db.database import get_async_db
 from services.cart_service import CartService
@@ -36,10 +36,13 @@ async def add_to_cart(
     return await cart_service.add_to_cart(db, product_add)
     
 
-
-
-
-
+@router.delete("/delete-from-cart")
+async def delete_from_cart(
+    product_cart_delete: ProductCartDelete,
+    db: AsyncSession = Depends(get_async_db),
+):
+    return await cart_service.delete_from_cart(db, product_cart_delete)
+    
 
 
 @router.websocket("/ws")

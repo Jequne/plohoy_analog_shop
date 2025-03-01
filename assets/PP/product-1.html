@@ -13,185 +13,141 @@
                 <div class="logo">
                     <img src="\assets\img\logo.png" href="#" alt="Logo">
                 </div>
-                
-                <!--  
-                <div class="go-back">
-                    <a href="#" class="go-back-button" >GO BACK</a>
-                </div>
-               -->
-                
                 <div class="cart">
                     <a href="#" class="cart-button">CART (0)</a>
                 </div>
             </div>
         </header>
     
-    
-    <div class="product-page-info">
-        <h1>{{product.name}} <span class="product-price">{{product.price}} ₽</span></h1>
-        <div class="three-buttons">
-            <!-- <button class="del-from-cart" 
-                data-product-id="{{ product.id }}"
-                data-product-name="{{ product.name }}"
-                data-product-price="{{ product.price }}"
-                data-product-quantity="{{ product.quantity }}">-</button> -->
-
-                <button class="del-from-cart" >-</button>
-
-            
-                <a href="#" class="go-to-cart" 
+        <div class="product-page-info">
+            <h1>{{product.name}} <span class="product-price">{{product.price}} ₽</span></h1>
+            <div class="three-buttons">
+                <!-- Кнопка для удаления товара из корзины, пока не активна -->
+                <button class="del-from-cart" data-reservation-id="" disabled>-</button>
+                <a href="#" class="go-to-cart">
+                    <span>В корзине {{product.count}} шт</span>
+                    <span>Перейти</span>
+                </a>
+                <!-- Кнопка для добавления товара в корзину -->
+                <button class="add-to-cart"
                     data-product-id="{{ product.id }}"
                     data-product-name="{{ product.name }}"
                     data-product-price="{{ product.price }}"
-                    data-product-quantity="{{ product.quantity }}">
-                <span>В корзине {{product.count}} шт</span>
-                <span>Перейти</span>
-            </a>
-            <button class="add-to-cart" 
-                data-product-id="{{ product.id }}"
-                data-product-name="{{ product.name }}"
-                data-product-price="{{ product.price }}"
-                data-product-quantity="{{ product.quantity }}">+</button>
-        </div>
-        <div class="page-text">
-            <h2>WEAVET HET</h2>
-            <ul class="nav-product">
-                <li class="nav-item-product">
-                    <a>green color</a>
-                </li>
-                <li class="nav-item-product">
-                    <a>Branded magnettic buttons</a>
-                </li>
-                <li class="nav-item-product">
-                    <a>Shipping</a>
-                </li>
-            </ul>
-            <span>LIMITED STOCK</span>
-        </div>
-    </div>
-
-
-
-    
-    <script>
-
-        // Функция для получения значения куки
-        const getCookie = (name) => {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        };
-
-        // Получаем session_id из куки (если есть) или используем значение по умолчанию
-        const sessionId = getCookie("session_id") || "some_default_session_id"; // предположим, что у пользователя нет куки
-
-
-        // Получаем элементы кнопок
-        const addToCartBtn = document.querySelector('.add-to-cart');
-        const delFromCartBtn = document.querySelector('.del-from-cart');
-        const cartButton = document.querySelector('.cart-button');
-
-        // Получаем данные о продукте из атрибутов кнопки
-        const productData = {
-            id: addToCartBtn.getAttribute('data-product-id'),
-            name: addToCartBtn.getAttribute('data-product-name'),
-            price: addToCartBtn.getAttribute('data-product-price'),
-            quantity: addToCartBtn.getAttribute('data-product-quantity')
-        };
-
-        // Функция для добавления товара в корзину
-        async function addToCart(productData) {
-            const response = await fetch(`/add-to-cart/${productData.id}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    product_id: productData.id,
-                    name: productData.name,
-                    price: productData.price,
-                    quantity: 1,  // например, добавляем 1 штуку
-                    session_id: sessionId
-                }),
-            });
-
-            if (response.ok) {
-                // Успешно добавлено в корзину, обновляем UI
-                alert('Товар добавлен в корзину!');
-                updateCartButton();
-            } else {
-                alert('Ошибка при добавлении в корзину');
-            }
-        }
-
-        // Функция для удаления товара из корзины
-        async function deleteFromCart(productData) {
-            const response = await fetch(`/delete-from-cart/${productData.id}`, {
-                method: 'DELETE',
-            });
-
-            if (response.ok) {
-                // Успешно удалено из корзины, обновляем UI
-                alert('Товар удален из корзины');
-                updateCartButton();
-            } else {
-                alert('Ошибка при удалении из корзины');
-            }
-        }
-
-        // Функция для обновления кнопки корзины
-        async function updateCartButton() {
-            const response = await fetch('/cart', {
-                method: 'GET',
-            });
-            const data = await response.json();
-            const cartCount = data.cartItemsCount; // Предположим, что сервер возвращает количество товаров в корзине
-            cartButton.innerText = `CART (${cartCount})`;
-        }
-
-        // Обработчики событий для кнопок
-        addToCartBtn.addEventListener('click', () => addToCart(productData));
-        delFromCartBtn.addEventListener('click', () => deleteFromCart(productData));
-
-        // Инициализируем начальное количество товаров в корзине
-        updateCartButton();
-    </script>
-
-    
-
-
-
-
-
-    <!-- Under Colontitul -->
-    
-    <footer class="under-col">
-        <div class="picture-col">
-            <img src="\assets\img\smiley.png" alt="plohoy smiley">
-        </div>
-        <div class="nav-wrapper-col">
-            <div class="nav-bar-col">
-                <ul class="nav-list">
-                    <li class="nav-item">
-                        <a href="#">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#">Terms of Service</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#">Privacy Policy</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#">Return & Refund Policy</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#">Support</a>
-                    </li>
-                </ul>
+                    data-product-quantity="{{ product.quantity }}">+</button>
             </div>
-        </div>     
-    </div>       
-    </footer>    
+        </div>
+
+        <script>
+            const addToCartBtn = document.querySelector('.add-to-cart');
+            const delFromCartBtn = document.querySelector('.del-from-cart');
+            const cartButton = document.querySelector('.cart-button');
+
+            // Функция для получения cookie
+            function getCookie(name) {
+                let matches = document.cookie.match(new RegExp(
+                    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+                ));
+                return matches ? decodeURIComponent(matches[1]) : undefined;
+            }
+
+            // Функция для добавления товара в корзину
+            async function addToCart() {
+                const productData = {
+                    product_id: addToCartBtn.getAttribute("data-product-id"),
+                    name: addToCartBtn.getAttribute("data-product-name"),
+                    price: addToCartBtn.getAttribute("data-product-price"),
+                    quantity: 1,
+                    session_id: getCookie("session_id")
+                };
+
+                const response = await fetch(`/add-to-cart/${productData.product_id}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(productData)
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    alert("Товар добавлен в корзину!");
+                    // Устанавливаем reservation_id в кнопке удаления
+                    delFromCartBtn.setAttribute("data-reservation-id", data.reservation_id);
+                    delFromCartBtn.removeAttribute("disabled");
+                    updateCartButton();
+                } else {
+                    alert("Ошибка: " + data.detail);
+                }
+            }
+
+            // Функция для удаления товара из корзины
+            async function deleteFromCart() {
+                const reservationId = delFromCartBtn.getAttribute("data-reservation-id");
+
+                if (!reservationId) {
+                    alert("Ошибка: товар не найден в корзине.");
+                    return;
+                }
+
+                const response = await fetch(`/delete-from-cart`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        session_id: getCookie("session_id"),  
+                        reservation_id: reservationId
+                    })
+                });
+
+                if (response.ok) {
+                    alert("Товар удален из корзины!");
+                    delFromCartBtn.setAttribute("data-reservation-id", "");
+                    delFromCartBtn.setAttribute("disabled", "true");
+                    updateCartButton();
+                } else {
+                    alert("Ошибка при удалении товара.");
+                }
+            }
+
+            // Функция для обновления количества товаров в корзине
+            async function updateCartButton() {
+                const response = await fetch('/cart', { method: 'GET' });
+                const data = await response.json();
+                cartButton.innerText = `CART (${data.cartItemsCount})`;  // Обновляем количество товаров в корзине
+            }
+
+            // Добавление событий на кнопки
+            addToCartBtn.addEventListener('click', addToCart);
+            delFromCartBtn.addEventListener('click', deleteFromCart);
+
+            // Обновление кнопки корзины при загрузке страницы
+            updateCartButton();
+        </script>
+
+        <!-- Footer -->
+        <footer class="under-col">
+            <div class="picture-col">
+                <img src="\assets\img\smiley.png" alt="plohoy smiley">
+            </div>
+            <div class="nav-wrapper-col">
+                <div class="nav-bar-col">
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="#">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#">Terms of Service</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#">Privacy Policy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#">Return & Refund Policy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#">Support</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>     
+        </footer>    
+    </div>
 </body>
 </html>
-
