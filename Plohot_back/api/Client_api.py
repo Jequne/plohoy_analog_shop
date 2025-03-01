@@ -8,7 +8,7 @@ import os
 from starlette.templating import Jinja2Templates
 
 from shemas.shemas import ProductAdd
-from helpers.cart_session_helper import session_create, session_create_1
+from helpers.cart_session_helper import  session_create_1
 from db.database import get_async_db
 from services.cart_service import CartService
 from services.web_sockets import WebSocketManager
